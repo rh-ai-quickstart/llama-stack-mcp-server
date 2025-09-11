@@ -269,6 +269,7 @@ oc logs -l app.kubernetes.io/name=custom-mcp-server
 
 # Test the service connectivity
 oc exec -it deployment/llama-stack -- curl http://custom-mcp-server/health
+```
 
 ## Cleanup
 

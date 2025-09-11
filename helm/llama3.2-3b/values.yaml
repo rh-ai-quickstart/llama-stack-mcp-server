@@ -7,7 +7,6 @@ serviceAccount:
   name: ""
 
 # User-customizable configuration
-namespace: "llama-stack-mcp-demo"
 device: "gpu"  # Options: "gpu", "cpu", "hpu"
 
 # Model configuration
