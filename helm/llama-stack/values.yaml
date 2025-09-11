@@ -2,7 +2,7 @@
 replicaCount: 1
 
 # User-customizable configuration
-device: "hpu"  # Options: "gpu", "cpu", "hpu"
+device: "gpu"  # Options: "gpu", "cpu", "hpu"
 
 image:
   repository: llamastack/distribution-remote-vllm
