@@ -52,21 +52,11 @@ spec:
     volumeMounts:
     - name: shm
       mountPath: /dev/shm
-    {{- if eq .Values.device "cpu" }}
-    - name: chat-template-volume
-      mountPath: /app/data/template/tool_chat_template_llama3.2_json.jinja
-      subPath: tool_chat_template_llama3.2_json.jinja
-    {{- end }}
   volumes:
   - name: shm
     emptyDir:
       medium: Memory
       sizeLimit: {{ .Values.servingRuntime.common.shmSizeLimit | default "1Gi" }}
-  {{- if eq .Values.device "cpu" }}
-  - name: chat-template-volume
-    configMap:
-      name: chat-template
-  {{- end }}
   {{- with (index .Values.nodeSelector .Values.device) }}
   nodeSelector:
     {{- toYaml . | nindent 4 }}

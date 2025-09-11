@@ -7,7 +7,7 @@ serviceAccount:
   name: ""
 
 # User-customizable configuration
-device: "gpu"  # Options: "gpu", "cpu", "hpu"
+device: "gpu"  # Options: "gpu", "hpu"
 
 # Model configuration
 model:
@@ -23,13 +23,6 @@ resources:
       nvidia.com/gpu: "1"
       memory: "16Gi"
       cpu: "2"
-  cpu:
-    limits:
-      cpu: "8"
-      memory: "24Gi"
-    requests:
-      cpu: "4"
-      memory: "16Gi"
   hpu:
     limits:
       cpu: "6"
@@ -43,7 +36,6 @@ resources:
 nodeSelector:
   gpu:
     nvidia.com/gpu.present: "true"
-  cpu: {}
   hpu: {}
 
 tolerations:
@@ -51,7 +43,6 @@ tolerations:
     - effect: NoSchedule
       key: nvidia.com/gpu
       value: NVIDIA-A10G-SHARED
-  cpu: []
   hpu:
     - effect: NoSchedule 
       key: habana.ai/gaudi
@@ -67,7 +58,6 @@ affinity:
             operator: In
             values:
             - "true"
-  cpu: {}
   hpu: {}
 
 # Environment variables
@@ -82,9 +72,6 @@ modelHardware:
   gpu: 
     name: "llama3-2-3b-gpu"
     displayName: "llama3.2-3b-gpu"
-  cpu: 
-    name: "llama3-2-3b-cpu"
-    displayName: "llama3.2-3b-cpu"
   hpu: 
     name: "llama3-2-3b-hpu"
     displayName: "llama3.2-3b-hpu"
@@ -112,12 +99,6 @@ servingRuntime:
     templateName: "vllm-runtime"
     acceleratorName: "gpu"
     image: "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3"
-  cpu:
-    recommendedAccelerators: []
-    templateDisplayName: "vLLM CPU ServingRuntime for KServe"
-    templateName: "vllm-cpu-runtime"
-    acceleratorName: "None"
-    image: "quay.io/ecosystem-appeng/vllm:cpu-v0.9.2"
   hpu:
     recommendedAccelerators:
       - "habana.ai/gaudi"
