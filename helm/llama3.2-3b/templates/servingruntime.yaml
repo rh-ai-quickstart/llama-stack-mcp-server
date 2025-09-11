@@ -2,16 +2,16 @@
 apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
-  name: {{ index .Values.modelHardware .Values.hardware "name" | default "llama3-2-3b" }}
+  name: {{ index .Values.modelHardware .Values.device "name" | default "llama3-2-3b" }}
   labels:
     {{- include "llama3-2-3b.labels" . | nindent 4 }}
   annotations:
     opendatahub.io/apiProtocol: REST
-    opendatahub.io/recommended-accelerators: {{ index .Values.servingRuntime .Values.hardware "recommendedAccelerators" | default (list "nvidia.com/gpu") | join "," }}
-    opendatahub.io/template-display-name: {{ index .Values.servingRuntime .Values.hardware "templateDisplayName" | default "vLLM ServingRuntime for KServe" }}
-    opendatahub.io/template-name: {{ index .Values.servingRuntime .Values.hardware "templateName" | default "vllm_runtime" }}
-    opendatahub.io/accelerator-name: {{ index .Values.servingRuntime .Values.hardware "acceleratorName" | default "migrated-gpu" }}
-    openshift.io/display-name: {{ index .Values.modelHardware .Values.hardware "displayName" | default "llama3-2-3b" }}
+    opendatahub.io/recommended-accelerators: {{ index .Values.servingRuntime .Values.device "recommendedAccelerators" | default (list "nvidia.com/gpu") | join "," }}
+    opendatahub.io/template-display-name: {{ index .Values.servingRuntime .Values.device "templateDisplayName" | default "vLLM ServingRuntime for KServe" }}
+    opendatahub.io/template-name: {{ index .Values.servingRuntime .Values.device "templateName" | default "vllm_runtime" }}
+    opendatahub.io/accelerator-name: {{ index .Values.servingRuntime .Values.device "acceleratorName" | default "migrated-gpu" }}
+    openshift.io/display-name: {{ index .Values.modelHardware .Values.device "displayName" | default "llama3-2-3b" }}
 spec:
   supportedModelFormats:
   - name: vLLM
@@ -22,7 +22,7 @@ spec:
     autoSelect: true
   containers:
   - name: kserve-container
-    image: {{ index .Values.servingRuntime .Values.hardware "image" | default "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3" }}
+    image: {{ index .Values.servingRuntime .Values.device "image" | default "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3" }}
     args:
     - --model=/mnt/models
     - --port=8080
@@ -45,14 +45,14 @@ spec:
     - containerPort: 8080
       name: h2c
       protocol: TCP
-    {{- with (index .Values.resources .Values.hardware) }}
+    {{- with (index .Values.resources .Values.device) }}
     resources:
       {{- toYaml . | nindent 6 }}
     {{- end }}
     volumeMounts:
     - name: shm
       mountPath: /dev/shm
-    {{- if eq .Values.hardware "cpu" }}
+    {{- if eq .Values.device "cpu" }}
     - name: chat-template-volume
       mountPath: /app/data/template/tool_chat_template_llama3.2_json.jinja
       subPath: tool_chat_template_llama3.2_json.jinja
@@ -62,20 +62,20 @@ spec:
     emptyDir:
       medium: Memory
       sizeLimit: {{ .Values.servingRuntime.common.shmSizeLimit | default "1Gi" }}
-  {{- if eq .Values.hardware "cpu" }}
+  {{- if eq .Values.device "cpu" }}
   - name: chat-template-volume
     configMap:
       name: chat-template
   {{- end }}
-  {{- with (index .Values.nodeSelector .Values.hardware) }}
+  {{- with (index .Values.nodeSelector .Values.device) }}
   nodeSelector:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with (index .Values.affinity .Values.hardware) }}
+  {{- with (index .Values.affinity .Values.device) }}
   affinity:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-  {{- with (index .Values.tolerations .Values.hardware) }}
+  {{- with (index .Values.tolerations .Values.device) }}
   tolerations:
     {{- toYaml . | nindent 4 }}
   {{- end }}

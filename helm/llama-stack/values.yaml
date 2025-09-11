@@ -1,6 +1,9 @@
 # Default values for llama-stack
 replicaCount: 1
 
+# User-customizable configuration
+device: "hpu"  # Options: "gpu", "cpu", "hpu"
+
 image:
   repository: llamastack/distribution-remote-vllm
   tag: "latest"
@@ -61,7 +64,7 @@ affinity: {}
 # Llama Stack configuration
 llamaStack:
   inferenceModel: "llama3-2-3b"
-  vllmUrl: "http://llama3-2-3b-predictor:8080/v1"
+  vllmUrl: "http://llama3-2-3b-{{ .Values.device }}-predictor:8080/v1"
 
 # Environment variables
 env:

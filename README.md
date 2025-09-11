@@ -154,6 +154,10 @@ oc new-project llama-stack-mcp-demo
 
 ### Build and deploy the helm chart
 
+By default the `device` variable is set to `gpu`. Change the value of `device` in these files to the desired hardware to run on [gpu, cpu, hpu]:
+- helm/llama-stack/values.yaml
+- helm/llama3.2-3b/values.yaml
+
 Deploy the complete Llama Stack with MCP servers using the umbrella chart:
 
 ```bash

@@ -1,12 +1,12 @@
 apiVersion: serving.kserve.io/v1beta1
 kind: InferenceService
 metadata:
-  name: {{ index .Values.modelHardware .Values.hardware "name" | default "llama3-2-3b" }}
+  name: {{ index .Values.modelHardware .Values.device "name" | default "llama3-2-3b" }}
   labels:
     {{- include "llama3-2-3b.labels" . | nindent 4 }}
     opendatahub.io/dashboard: 'true'
   annotations:
-    openshift.io/display-name: {{ index .Values.modelHardware .Values.hardware "displayName" | default "llama3.2-3b" }}
+    openshift.io/display-name: {{ index .Values.modelHardware .Values.device "displayName" | default "llama3.2-3b" }}
     serving.knative.openshift.io/enablePassthrough: 'true'
     sidecar.istio.io/inject: 'true'
     sidecar.istio.io/rewriteAppHTTPProbers: 'true'
@@ -19,13 +19,13 @@ spec:
       modelFormat:
         name: {{ .Values.inferenceService.common.modelFormat | default "vLLM" }}
       name: {{ .Values.inferenceService.common.modelName | default "" }}
-      {{- with (index .Values.resources .Values.hardware)}}
+      {{- with (index .Values.resources .Values.device)}}
       resources:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      runtime: {{ index .Values.modelHardware .Values.hardware "name" | default "llama3-2-3b" }}
+      runtime: {{ index .Values.modelHardware .Values.device "name" | default "llama3-2-3b" }}
       storageUri: {{ .Values.inferenceService.common.storageUri | default "oci://quay.io/redhat-ai-services/modelcar-catalog:llama-3.2-3b-instruct" }}
-    {{- with (index .Values.tolerations .Values.hardware)}}
+    {{- with (index .Values.tolerations .Values.device)}}
     tolerations:
       {{- toYaml . | nindent 4 }}
     {{- end }}
