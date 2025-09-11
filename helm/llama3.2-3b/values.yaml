@@ -8,7 +8,7 @@ serviceAccount:
 
 # User-customizable configuration
 namespace: "llama-stack-mcp-demo"
-hardware: "cpu"  # Options: "gpu", "cpu", "hpu"
+hardware: "gpu"  # Options: "gpu", "cpu", "hpu"
 
 # Model configuration
 model:
@@ -30,15 +30,15 @@ resources:
       memory: "24Gi"
     requests:
       cpu: "4"
-      memory: "12Gi"
+      memory: "16Gi"
   hpu:
     limits:
       cpu: "6"
-      memory: "16Gi"
+      memory: "24Gi"
       habana.ai/gaudi: "1"
     requests:
       cpu: "4"
-      memory: "8Gi"
+      memory: "16Gi"
       habana.ai/gaudi: "1"
 
 nodeSelector:
@@ -53,7 +53,10 @@ tolerations:
       key: nvidia.com/gpu
       value: NVIDIA-A10G-SHARED
   cpu: []
-  hpu: []
+  hpu:
+    - effect: NoSchedule 
+      key: habana.ai/gaudi
+      operator: Exists
 
 affinity:
   gpu:
@@ -71,6 +74,7 @@ affinity:
 # Environment variables
 env:
   CUDA_VISIBLE_DEVICES: "0"
+  HABANA_VISIBLE_DEVICES: "all"
   TRANSFORMERS_CACHE: "/root/.cache/huggingface"
   HF_HOME: "/root/.cache/huggingface"
 
@@ -110,16 +114,15 @@ servingRuntime:
     acceleratorName: "gpu"
     image: "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3"
   cpu:
-    recommendedAccelerators:
-      - "cpu"
+    recommendedAccelerators: []
     templateDisplayName: "vLLM CPU ServingRuntime for KServe"
     templateName: "vllm-cpu-runtime"
     acceleratorName: "None"
-    image: "public.ecr.aws/q9t5s3a7/vllm-cpu-release-repo:latest"
+    image: "quay.io/ecosystem-appeng/vllm:cpu-v0.9.2"
   hpu:
     recommendedAccelerators:
       - "habana.ai/gaudi"
     templateDisplayName: "vLLM Intel Gaudi Accelerator ServingRuntime for KServe"
     templateName: "vllm-gaudi-runtime"
     acceleratorName: "gaudi-hpu-profile"
-    image: "quay.io/modh/vllm@sha256:af6a071be36d8a99476f145d1589d7ede97d2760b93335b14ca26de7417e438c"
+    image: "quay.io/modh/vllm:vllm-gaudi-v2-22-on-push-jgj5q-build-container"

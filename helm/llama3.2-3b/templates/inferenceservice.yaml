@@ -13,18 +13,18 @@ metadata:
     serving.kserve.io/deploymentMode: RawDeployment
 spec:
   predictor:
-    maxReplicas: {{ .Values.inferenceService.maxReplicas | default 1 }}
-    minReplicas: {{ .Values.inferenceService.minReplicas | default 1 }}
+    maxReplicas: {{ .Values.inferenceService.common.maxReplicas | default 1 }}
+    minReplicas: {{ .Values.inferenceService.common.minReplicas | default 1 }}
     model:
       modelFormat:
-        name: {{ .Values.inferenceService.modelFormat | default "vLLM" }}
-      name: {{ .Values.inferenceService.modelName | default "" }}
+        name: {{ .Values.inferenceService.common.modelFormat | default "vLLM" }}
+      name: {{ .Values.inferenceService.common.modelName | default "" }}
       {{- with (index .Values.resources .Values.hardware)}}
       resources:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       runtime: {{ index .Values.modelHardware .Values.hardware "name" | default "llama3-2-3b" }}
-      storageUri: {{ .Values.inferenceService.storageUri | default "oci://quay.io/redhat-ai-services/modelcar-catalog:llama-3.2-3b-instruct" }}
+      storageUri: {{ .Values.inferenceService.common.storageUri | default "oci://quay.io/redhat-ai-services/modelcar-catalog:llama-3.2-3b-instruct" }}
     {{- with (index .Values.tolerations .Values.hardware)}}
     tolerations:
       {{- toYaml . | nindent 4 }}
