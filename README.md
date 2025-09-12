@@ -108,9 +108,12 @@ This seamless integration allows the LLM to access real-time data and perform ac
 
 ### Minimum hardware requirements
 
-- 1 GPU required (NVIDIA L40, A10, or similar)
 - 8+ vCPUs
 - 24+ GiB RAM
+
+#### Optional, depending on selected hardware platform
+- 1 GPU (NVIDIA L40, A10, or similar)
+- 1 Intel® Gaudi® AI Accelerator
 
 ### Required software
 
