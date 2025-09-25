@@ -105,4 +105,4 @@ servingRuntime:
     templateDisplayName: "vLLM Intel Gaudi Accelerator ServingRuntime for KServe"
     templateName: "vllm-gaudi-runtime"
     acceleratorName: "gaudi-hpu-profile"
-    image: "quay.io/modh/vllm:vllm-gaudi-v2-22-on-push-jgj5q-build-container"
+    image: "quay.io/modh/vllm:vllm-gaudi-v2-25-on-push-n7985-build-images"
