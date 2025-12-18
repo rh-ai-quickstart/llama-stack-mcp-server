@@ -160,7 +160,7 @@ oc new-project llama-stack-mcp-demo
 Deploy the complete Llama Stack with MCP servers using the umbrella chart:
 
 ```bash
-# Set device, options: [gpu, hpu]
+# Set device, options: [gpu, cpu, hpu]
 export DEVICE="gpu"
 
 # Build dependencies (downloads and packages all required charts)
