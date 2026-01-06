@@ -108,7 +108,7 @@ This seamless integration allows the LLM to access real-time data and perform ac
 
 ### Minimum hardware requirements
 
-- 8+ vCPUs
+- 8+ vCPUs with 4th Gen Intel® Xeon® Scalable processors or newer
 - 24+ GiB RAM
 
 #### Optional, depending on selected hardware platform
