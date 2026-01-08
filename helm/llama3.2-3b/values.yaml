@@ -30,7 +30,7 @@ model:
     - --enforce-eager
     - --max-num-batched-tokens=2048
     - --max-num-seqs=256
-    - --tensor-parallel-size=2
+    - --tensor-parallel-size=1
     - --pipeline-parallel-size=1
   hpu:
     - --block-size=128
@@ -56,10 +56,10 @@ resources:
   cpu:
     limits:
       cpu: "16"
-      memory: "24Gi"
+      memory: "64Gi"
     requests:
       cpu: "8"
-      memory: "16Gi"
+      memory: "32Gi"
   hpu:
     limits:
       cpu: "6"
