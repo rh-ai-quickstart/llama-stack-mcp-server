@@ -172,7 +172,7 @@ servingRuntime:
     acceleratorName: "gpu"
     image: "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3"
   cpu:
-    recommendedAccelerators: []
+    recommendedAccelerators: "none"
     templateDisplayName: "vLLM CPU ServingRuntime for KServe"
     templateName: "vllm-cpu-runtime"
     acceleratorName: "None"
