@@ -7,11 +7,41 @@ serviceAccount:
   name: ""
 
 # User-customizable configuration
-device: "gpu"  # Options: "gpu", "hpu"
+device: "gpu"  # Options: ["gpu", "cpu", "hpu"]
 
 # Model configuration
 model:
-  maxModelLen: 8192
+  common:
+    - --model=/mnt/models
+    - --port=8080
+    - --served-model-name=llama3-2-3b
+    - --chat-template=/app/data/template/tool_chat_template_llama3.2_json.jinja
+    - --disable-log-requests
+    - --enable-auto-tool-choice
+    - --tool-call-parser=llama3_json
+  gpu:
+    - --max-model-len=8192
+  cpu:
+    - --block-size=128
+    - --dtype=bfloat16
+    - --max-model-len=8192
+    - --distributed-executor-backend=mp
+    - --enable-chunked-prefill
+    - --enforce-eager
+    - --max-num-batched-tokens=2048
+    - --max-num-seqs=256
+    - --tensor-parallel-size=1
+    - --pipeline-parallel-size=1
+  hpu:
+    - --block-size=128
+    - --dtype=bfloat16
+    - --max-model-len=33024
+    - --gpu-memory-util=0.99
+    - --max-num-seqs=256
+    - --max-num-prefill-seqs=16
+    - --num-scheduler-steps=1
+    - --use-padding-aware-scheduling
+    - --tensor-parallel-size=1
 
 resources:
   gpu:
@@ -23,6 +53,13 @@ resources:
       nvidia.com/gpu: "1"
       memory: "16Gi"
       cpu: "2"
+  cpu:
+    limits:
+      cpu: "16"
+      memory: "64Gi"
+    requests:
+      cpu: "8"
+      memory: "32Gi"
   hpu:
     limits:
       cpu: "6"
@@ -36,6 +73,7 @@ resources:
 nodeSelector:
   gpu:
     nvidia.com/gpu.present: "true"
+  cpu: {}
   hpu: {}
 
 tolerations:
@@ -43,6 +81,7 @@ tolerations:
     - effect: NoSchedule
       key: nvidia.com/gpu
       value: NVIDIA-A10G-SHARED
+  cpu: []
   hpu:
     - effect: NoSchedule 
       key: habana.ai/gaudi
@@ -58,20 +97,53 @@ affinity:
             operator: In
             values:
             - "true"
+  cpu: {}
   hpu: {}
 
 # Environment variables
 env:
-  CUDA_VISIBLE_DEVICES: "0"
-  HABANA_VISIBLE_DEVICES: "all"
-  TRANSFORMERS_CACHE: "/root/.cache/huggingface"
-  HF_HOME: "/root/.cache/huggingface"
+  common:
+    HF_HOME: "/root/.cache/huggingface"
+    VLLM_CACHE_DIR: "/tmp/vllm_cache"
+    XDG_CACHE_HOME: "/tmp/.cache"
+  gpu:
+    CUDA_VISIBLE_DEVICES: "0"
+  cpu:
+    VLLM_CPU_KVCACHE_SPACE: "40"
+    VLLM_RPC_TIMEOUT: "100000"
+    VLLM_ALLOW_LONG_MAX_MODEL_LEN: "1"
+    VLLM_ENGINE_ITERATION_TIMEOUT_S: "120"
+    VLLM_CPU_NUM_OF_RESERVED_CPU: "0"
+    VLLM_CPU_SGL_KERNEL: "1"
+    HF_HUB_DISABLE_XET: "1"
+  hpu:
+    runtime: "habana"
+    HABANA_VISIBLE_DEVICES: "all"
+    EXPERIMENTAL_WEIGHT_SHARING: 0
+    PT_HPU_ENABLE_LAZY_COLLECTIVES: true
+    PT_HPU_LAZY_MODE: 1
+    VLLM_DECODE_BLOCK_BUCKET_MAX: 66048
+    VLLM_DECODE_BLOCK_BUCKET_STEP: 256
+    VLLM_DECODE_BS_BUCKET_STEP: 32
+    VLLM_DELAYED_SAMPLING: true
+    VLLM_EXPONENTIAL_BUCKETING: false
+    VLLM_GRAPH_PROMPT_RATIO: 0.5
+    VLLM_GRAPH_RESERVED_MEM: 0.09
+    VLLM_PROMPT_BS_BUCKET_STEP: 32
+    VLLM_PROMPT_SEQ_BUCKET_MAX: 33024
+    VLLM_PROMPT_SEQ_BUCKET_STEP: 256
+    VLLM_PROMPT_USE_FUSEDSDPA: 1
+    HF_HUB_DISABLE_XET: 1
+    VLLM_SKIP_WARMUP: false
 
 # modelHardware configuration, used for both inferenceService and servingRuntime
 modelHardware:
   gpu: 
     name: "llama3-2-3b-gpu"
     displayName: "llama3.2-3b-gpu"
+  cpu: 
+    name: "llama3-2-3b-cpu"
+    displayName: "llama3.2-3b-cpu"
   hpu: 
     name: "llama3-2-3b-hpu"
     displayName: "llama3.2-3b-hpu"
@@ -99,6 +171,12 @@ servingRuntime:
     templateName: "vllm-runtime"
     acceleratorName: "gpu"
     image: "quay.io/modh/vllm@sha256:0d55419f3d168fd80868a36ac89815dded9e063937a8409b7edf3529771383f3"
+  cpu:
+    recommendedAccelerators: "none"
+    templateDisplayName: "vLLM CPU ServingRuntime for KServe"
+    templateName: "vllm-cpu-runtime"
+    acceleratorName: "None"
+    image: "opea/vllm-cpu-ubi:v0.12.0-ubi9"
   hpu:
     recommendedAccelerators:
       - "habana.ai/gaudi"

@@ -1,7 +1,7 @@
 # Default values for llama-stack-mcp umbrella chart
 # This is a YAML-formatted file that configures all components
 
-device: "gpu" # Options: ["gpu", "hpu"]
+device: "gpu" # Options: ["gpu", "cpu", "hpu"]
 
 # Component enablement flags - each component can be individually enabled/disabled
 components:
